@@ -1,36 +1,61 @@
 .
-├── backend/                  # 后端项目 (FastAPI)
+├── backend/                  # 后端项目 (FastAPI + SQLModel)
 │   ├── app/                  # 主应用目录
+│   │   ├── alembic/          # 数据库迁移配置 (生成的迁移脚本在 versions/ 下)
 │   │   ├── api/              # API 路由
-│   │   │   ├── routes/       # 具体的业务路由实现 (users, items, login)
-│   │   │   ├── deps.py       # 依赖注入 (如获取当前用户、DB 会话)
-│   │   │   └── main.py       # 路由总入口 (API Router 汇总)
-│   │   ├── core/             # 核心配置
-│   │   │   ├── config.py     # 环境变量读取与 Pydantic 配置
-│   │   │   ├── db.py         # 数据库引擎初始化
-│   │   │   └── security.py   # JWT 令牌生成、密码哈希处理
-│   │   ├── crud/             # 封装增删改查逻辑 (保持 API 层简洁)
-│   │   ├── models.py         # SQLModel 数据库表结构模型
-│   │   ├── schemas.py        # Pydantic 数据验证模型 (Request/Response Body)
-│   │   ├── main.py           # FastAPI 实例初始化入口
-│   │   ├── initial_data.py   # 首次运行插入初始管理员数据
-│   │   └── backend_pre_start.py # 启动前数据库连接检查
-│   ├── alembic/              # 数据库迁移工具目录
-│   ├── tests/                # 单元/集成测试
-│   ├── pyproject.toml        # 后端依赖管理 (uv/pip)
-│   └── Dockerfile            # 后端镜像构建定义
+│   │   │   ├── routes/       # 具体的业务接口实现 (login, users, items 等)
+│   │   │   └── main.py       # 路由总入口 (汇总所有业务路由)
+│   │   ├── core/             # 核心基础配置
+│   │   │   ├── config.py     # 环境变量读取与全局配置声明
+│   │   │   ├── db.py         # 数据库 Session 与 Engine 初始化
+│   │   │   └── security.py   # JWT 认证逻辑与密码加密工具
+│   │   ├── email-templates/  # 业务邮件模板 (MJML/HTML 格式)
+│   │   ├── crud.py           # 核心逻辑：封装数据库增删改查操作
+│   │   ├── models.py         # 数据库模型：定义表结构 (SQLModel)
+│   │   ├── utils.py          # 通用工具函数 (如发送邮件)
+│   │   ├── main.py           # FastAPI 实例创建与全局中间件配置
+│   │   ├── initial_data.py   # 脚本：系统首次启动时插入初始管理员数据
+│   │   └── backend_pre_start.py # 脚本：等待并确认数据库连接可用
+│   ├── scripts/              # 辅助开发脚本 (lint, format, test, prestart)
+│   ├── tests/                # 自动化测试目录 (包含 api、crud 等测试)
+│   ├── alembic.ini           # Alembic 迁移工具配置文件
+│   ├── pyproject.toml        # 后端依赖管理与项目元数据 (基于 uv/pip)
+│   └── Dockerfile            # 后端镜像构建定义 (Python 生产环境环境)
 │
-├── frontend/                 # 前端项目 (Vue 3 + TS + Vite)
-│   ├── src/
-│   │   ├── api/              # 自动生成的 API 客户端 (基于 OpenAPI)
-│   │   ├── components/       # UI 通用组件 (Element Plus / Shadcn)
-│   │   ├── routes/           # 基于文件的路由管理 (TanStack Router)
-│   │   ├── store/            # 状态管理 (Pinia)
-│   │   └── theme/            # 样式与主题配置
-│   ├── public/               # 静态资源
-│   ├── index.html            # 入口页面
-│   ├── package.json          # 前端依赖配置
-│   └── Dockerfile            # 前端镜像构建定义 (通常用 Nginx 托管)
+├── frontend/                # 前端项目根目录
+│   ├── src/                 # 源代码
+│   │   ├── client/          # 【核心】由 openapi-ts 自动生成的后端 SDK
+│   │   │   ├── core/        # 生成的请求核心逻辑 (错误处理、类型定义等)
+│   │   │   ├── schemas.gen.ts # 从后端 OpenAPI 导出的 JSON Schema
+│   │   │   ├── sdk.gen.ts   # 封装好的 API 调用方法 (Service 层)
+│   │   │   └── types.gen.ts # 所有的请求/响应 TypeScript 类型定义
+│   │   ├── components/      # UI 组件 (Radix UI / 业务组件)
+│   │   ├── hooks/           # 自定义 React Hooks (认证、状态等)
+│   │   ├── lib/             # 公共工具库 (通常包含 utils, tailwind 合并函数等)
+│   │   ├── routes/          # 【路由】TanStack Router 基于文件的路由实现
+│   │   ├── index.css        # 全局样式 (Tailwind CSS 入口)
+│   │   ├── main.tsx         # 应用渲染入口 (React 19)
+│   │   ├── routeTree.gen.ts # TanStack Router 自动生成的路由映射树
+│   │   └── vite-env.d.ts    # Vite 环境变量类型声明
+│   ├── .tanstack/           # TanStack Router 的本地缓存/配置目录
+│   ├── tests/               # Playwright 测试用例
+│   ├── .dockerignore        # 排除不需要打进 Docker 镜像的文件 (如 node_modules)
+│   ├── .env                 # 前端环境变量 (VITE_API_URL 等)
+│   ├── .gitignore           # Git 忽略文件
+│   ├── biome.json           # Biome 配置文件 (替代 ESLint/Prettier，极速格式化)
+│   ├── components.json      # Shadcn UI / Radix UI 的组件初始化配置
+│   ├── Dockerfile           # 生产环境部署镜像 (通常是 Node 编译 + Nginx 托管)
+│   ├── Dockerfile.playwright # 专门用于运行 Playwright 测试的容器镜像
+│   ├── index.html           # SPA 应用的入口 HTML
+│   ├── nginx.conf           # Nginx 主配置文件
+│   ├── nginx-backend-not-found.conf # Nginx 特殊配置：处理前端路由刷新 404 问题
+│   ├── openapi-ts.config.ts # 【重要】openapi-ts 的生成配置，定义后端接口地址和输出路径
+│   ├── package.json         # 项目依赖与脚本定义
+│   ├── playwright.config.ts # E2E 测试框架 Playwright 的全局配置
+│   ├── tsconfig.json        # TypeScript 主配置
+│   ├── tsconfig.build.json  # 专门用于生产环境构建的 TS 配置
+│   ├── tsconfig.node.json   # 针对 Vite 配置文件等 Node 环境的 TS 配置
+│   └── vite.config.ts       # Vite 配置文件 (集成了 React、TanStack Router 等插件)
 │
 ├── scripts/                  # 全局自动化脚本
 │   ├── prestart.sh           # 容器启动前的核心脚本 (执行迁移和初始化)
