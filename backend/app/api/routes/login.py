@@ -5,7 +5,8 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
 
-from app import crud
+# 修改导入：从专门的用户模块引入数据访问层
+from app.users import crud
 from app.api.deps import CurrentUser, SessionDep, get_current_active_superuser
 from app.core import security
 from app.core.config import settings
@@ -27,6 +28,7 @@ def login_access_token(
     """
     OAuth2 compatible token login, get an access token for future requests
     """
+    # 使用用户模块的认证
     user = crud.authenticate(
         session=session, email=form_data.username, password=form_data.password
     )
@@ -34,6 +36,7 @@ def login_access_token(
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     elif not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
+        
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     return Token(
         access_token=security.create_access_token(
@@ -55,10 +58,9 @@ def recover_password(email: str, session: SessionDep) -> Message:
     """
     Password Recovery
     """
+    # 使用用户模块的查询
     user = crud.get_user_by_email(session=session, email=email)
 
-    # Always return the same response to prevent email enumeration attacks
-    # Only send email if user actually exists
     if user:
         password_reset_token = generate_password_reset_token(email=email)
         email_data = generate_reset_password_email(
@@ -82,13 +84,16 @@ def reset_password(session: SessionDep, body: NewPassword) -> Message:
     email = verify_password_reset_token(token=body.token)
     if not email:
         raise HTTPException(status_code=400, detail="Invalid token")
+        
     user = crud.get_user_by_email(session=session, email=email)
     if not user:
-        # Don't reveal that the user doesn't exist - use same error as invalid token
         raise HTTPException(status_code=400, detail="Invalid token")
     elif not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
+        
     user_in_update = UserUpdate(password=body.new_password)
+    
+    # 核心调整：直接调用重构后的用户模块 update_user，底层会自动处理密码哈希
     crud.update_user(
         session=session,
         db_user=user,

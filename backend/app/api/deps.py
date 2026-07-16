@@ -11,7 +11,11 @@ from sqlmodel import Session
 from app.core import security
 from app.core.config import settings
 from app.core.db import engine
-from app.models import TokenPayload, User
+# 调整 1：将 User 改为从专门的用户模块 models 中导入，TokenPayload 保持原样
+from app.models import TokenPayload
+from app.users.models import User
+# 调整 2：引入用户模块专属的数据访问层
+from app.users import crud
 
 reusable_oauth2 = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_STR}/login/access-token"
@@ -38,7 +42,9 @@ def get_current_user(session: SessionDep, token: TokenDep) -> User:
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Could not validate credentials",
         )
-    user = session.get(User, token_data.sub)
+        
+    user = crud.get_user_by_id(session=session, user_id=token_data.sub)
+    
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     if not user.is_active:
