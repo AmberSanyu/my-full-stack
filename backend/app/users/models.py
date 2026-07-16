@@ -5,9 +5,13 @@ from pydantic import EmailStr
 from sqlalchemy import DateTime
 from sqlmodel import Field, Relationship, SQLModel
 from sqlalchemy.orm import relationship # 需要引入原生 relationship
-
+from typing import TYPE_CHECKING
 def get_datetime_utc() -> datetime:
     return datetime.now(timezone.utc)
+
+# 加上这几行，只给编辑器/类型检查器看
+if TYPE_CHECKING:
+    from app.items.models import Item
 
 # 共享属性
 class UserBase(SQLModel):
