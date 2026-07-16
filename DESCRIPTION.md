@@ -1,3 +1,4 @@
+## 目录结构
 .
 ├── backend/                  # 后端项目 (FastAPI + SQLModel)
 │   ├── app/                  # 主应用目录
@@ -68,3 +69,16 @@
 ├── compose.override.yml      # (可选) 本地开发时的端口映射覆盖
 ├── .env                      # 所有的核心环境变量 (SECRET, DB_PASS 等)
 └── .gitignore                # 忽略文件配置 (已帮你确认包含 .env)
+
+
+## GIT提交规则
+GitHub 支持使用冒号包裹的简写语法 :emoji_name:。这种写法在提交后会被自动渲染成对应的彩色 Emoji。
+以下是开发者提交代码时最常用、最通用的简写和它们对应的场景：
+- 新功能：:sparkles: $\rightarrow$ :sparkles: (Sparkles) 或 :tada: $\rightarrow$ :tada: (Celebrate)
+- 修复 Bug：:bug: $\rightarrow$ :bug: (Bug)
+- 重构代码：:recycle: $\rightarrow$ :recycle: (Recycle)
+- 文档更新：:memo: $\rightarrow$ :memo: (Memo) 或 :books: $\rightarrow$ :books: (Books)
+- 性能优化：:zap: $\rightarrow$ :zap: (Zap/Lightning)
+- 测试相关：:white_check_mark: $\rightarrow$ :white_check_mark: (White Check Mark)
+- 移除代码/文件：:fire: $\rightarrow$ :fire: (Fire)
+- 安全修复：:lock: $\rightarrow$ :lock: (Lock)
