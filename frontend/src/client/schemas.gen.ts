@@ -251,6 +251,218 @@ export const PrivateUserCreateSchema = {
     title: 'PrivateUserCreate'
 } as const;
 
+export const TaskCreateSchema = {
+    properties: {
+        title: {
+            type: 'string',
+            maxLength: 255,
+            minLength: 1,
+            title: 'Title'
+        },
+        description: {
+            anyOf: [
+                {
+                    type: 'string',
+                    maxLength: 1000
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Description'
+        },
+        status: {
+            type: 'string',
+            title: 'Status',
+            default: 'todo'
+        },
+        priority: {
+            '$ref': '#/components/schemas/TaskPriority',
+            default: 'medium'
+        },
+        due_date: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Due Date'
+        }
+    },
+    type: 'object',
+    required: ['title'],
+    title: 'TaskCreate'
+} as const;
+
+export const TaskPrioritySchema = {
+    type: 'string',
+    enum: ['low', 'medium', 'high'],
+    title: 'TaskPriority'
+} as const;
+
+export const TaskPublicSchema = {
+    properties: {
+        title: {
+            type: 'string',
+            maxLength: 255,
+            minLength: 1,
+            title: 'Title'
+        },
+        description: {
+            anyOf: [
+                {
+                    type: 'string',
+                    maxLength: 1000
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Description'
+        },
+        status: {
+            type: 'string',
+            title: 'Status',
+            default: 'todo'
+        },
+        priority: {
+            '$ref': '#/components/schemas/TaskPriority',
+            default: 'medium'
+        },
+        due_date: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Due Date'
+        },
+        id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Id'
+        },
+        task_no: {
+            type: 'string',
+            title: 'Task No'
+        },
+        owner_id: {
+            type: 'string',
+            format: 'uuid',
+            title: 'Owner Id'
+        },
+        created_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Created At'
+        }
+    },
+    type: 'object',
+    required: ['title', 'id', 'task_no', 'owner_id'],
+    title: 'TaskPublic'
+} as const;
+
+export const TaskUpdateSchema = {
+    properties: {
+        title: {
+            anyOf: [
+                {
+                    type: 'string',
+                    maxLength: 255,
+                    minLength: 1
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Title'
+        },
+        description: {
+            anyOf: [
+                {
+                    type: 'string',
+                    maxLength: 1000
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Description'
+        },
+        status: {
+            anyOf: [
+                {
+                    type: 'string',
+                    maxLength: 255,
+                    minLength: 1
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Status'
+        },
+        priority: {
+            anyOf: [
+                {
+                    '$ref': '#/components/schemas/TaskPriority'
+                },
+                {
+                    type: 'null'
+                }
+            ]
+        },
+        due_date: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Due Date'
+        }
+    },
+    type: 'object',
+    title: 'TaskUpdate'
+} as const;
+
+export const TasksPublicSchema = {
+    properties: {
+        data: {
+            items: {
+                '$ref': '#/components/schemas/TaskPublic'
+            },
+            type: 'array',
+            title: 'Data'
+        },
+        count: {
+            type: 'integer',
+            title: 'Count'
+        }
+    },
+    type: 'object',
+    required: ['data', 'count'],
+    title: 'TasksPublic'
+} as const;
+
 export const TokenSchema = {
     properties: {
         access_token: {
@@ -272,13 +484,13 @@ export const UpdatePasswordSchema = {
     properties: {
         current_password: {
             type: 'string',
-            maxLength: 128,
+            maxLength: 40,
             minLength: 8,
             title: 'Current Password'
         },
         new_password: {
             type: 'string',
-            maxLength: 128,
+            maxLength: 40,
             minLength: 8,
             title: 'New Password'
         }
@@ -293,7 +505,6 @@ export const UserCreateSchema = {
         email: {
             type: 'string',
             maxLength: 255,
-            format: 'email',
             title: 'Email'
         },
         is_active: {
@@ -320,7 +531,7 @@ export const UserCreateSchema = {
         },
         password: {
             type: 'string',
-            maxLength: 128,
+            maxLength: 40,
             minLength: 8,
             title: 'Password'
         }
@@ -335,7 +546,6 @@ export const UserPublicSchema = {
         email: {
             type: 'string',
             maxLength: 255,
-            format: 'email',
             title: 'Email'
         },
         is_active: {
@@ -364,18 +574,6 @@ export const UserPublicSchema = {
             type: 'string',
             format: 'uuid',
             title: 'Id'
-        },
-        created_at: {
-            anyOf: [
-                {
-                    type: 'string',
-                    format: 'date-time'
-                },
-                {
-                    type: 'null'
-                }
-            ],
-            title: 'Created At'
         }
     },
     type: 'object',
@@ -388,26 +586,13 @@ export const UserRegisterSchema = {
         email: {
             type: 'string',
             maxLength: 255,
-            format: 'email',
             title: 'Email'
         },
         password: {
             type: 'string',
-            maxLength: 128,
+            maxLength: 40,
             minLength: 8,
             title: 'Password'
-        },
-        full_name: {
-            anyOf: [
-                {
-                    type: 'string',
-                    maxLength: 255
-                },
-                {
-                    type: 'null'
-                }
-            ],
-            title: 'Full Name'
         }
     },
     type: 'object',
@@ -421,8 +606,7 @@ export const UserUpdateSchema = {
             anyOf: [
                 {
                     type: 'string',
-                    maxLength: 255,
-                    format: 'email'
+                    maxLength: 255
                 },
                 {
                     type: 'null'
@@ -456,7 +640,7 @@ export const UserUpdateSchema = {
             anyOf: [
                 {
                     type: 'string',
-                    maxLength: 128,
+                    maxLength: 40,
                     minLength: 8
                 },
                 {

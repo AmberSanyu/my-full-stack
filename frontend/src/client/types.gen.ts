@@ -52,6 +52,41 @@ export type PrivateUserCreate = {
     is_verified?: boolean;
 };
 
+export type TaskCreate = {
+    title: string;
+    description?: (string | null);
+    status?: string;
+    priority?: TaskPriority;
+    due_date?: (string | null);
+};
+
+export type TaskPriority = 'low' | 'medium' | 'high';
+
+export type TaskPublic = {
+    title: string;
+    description?: (string | null);
+    status?: string;
+    priority?: TaskPriority;
+    due_date?: (string | null);
+    id: string;
+    task_no: string;
+    owner_id: string;
+    created_at?: (string | null);
+};
+
+export type TasksPublic = {
+    data: Array<TaskPublic>;
+    count: number;
+};
+
+export type TaskUpdate = {
+    title?: (string | null);
+    description?: (string | null);
+    status?: (string | null);
+    priority?: (TaskPriority | null);
+    due_date?: (string | null);
+};
+
 export type Token = {
     access_token: string;
     token_type?: string;
@@ -76,13 +111,11 @@ export type UserPublic = {
     is_superuser?: boolean;
     full_name?: (string | null);
     id: string;
-    created_at?: (string | null);
 };
 
 export type UserRegister = {
     email: string;
     password: string;
-    full_name?: (string | null);
 };
 
 export type UsersPublic = {
@@ -176,6 +209,32 @@ export type PrivateCreateUserData = {
 };
 
 export type PrivateCreateUserResponse = (UserPublic);
+
+export type TasksReadTasksData = {
+    limit?: number;
+    skip?: number;
+};
+
+export type TasksReadTasksResponse = (TasksPublic);
+
+export type TasksCreateTaskData = {
+    requestBody: TaskCreate;
+};
+
+export type TasksCreateTaskResponse = (TaskPublic);
+
+export type TasksUpdateTaskRouteData = {
+    requestBody: TaskUpdate;
+    taskNo: string;
+};
+
+export type TasksUpdateTaskRouteResponse = (TaskPublic);
+
+export type TasksDeleteTaskRouteData = {
+    taskNo: string;
+};
+
+export type TasksDeleteTaskRouteResponse = (Message);
 
 export type UsersReadUsersData = {
     limit?: number;

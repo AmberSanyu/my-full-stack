@@ -1,9 +1,9 @@
 from uuid import UUID, uuid4
-from sqlmodel import Field, Relationship, SQLModel
+from sqlmodel import Field, Relationship, SQLModel, AutoString
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
-from string import ascii_uppercase, digits
-
+from enum import Enum
+import sqlalchemy as sa
 if TYPE_CHECKING:
     from app.users.models import User
 
@@ -14,14 +14,33 @@ def get_datetime_utc() -> datetime:
 def generate_task_no() -> str:
     # 示例规则：TASK-年份月份-4位随机字母数字组合
     # 如：TASK-202607-A8B9
-    current_time = get_datetime_utc
+    current_time = get_datetime_utc().strftime("%Y%m%d%H%M%S")
     return f"TASK-{current_time}"
+
+# 1. 定义优先级枚举
+class TaskPriority(str, Enum):
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
 
 # 基础模型（用于前端传输和校验，不建表）
 class TaskBase(SQLModel):
     title: str = Field(min_length=1, max_length=255)
     description: str | None = Field(default=None, max_length=1000)
     status: str = Field(default="todo")  # todo, doing, done
+    priority: TaskPriority = Field(
+        default=TaskPriority.MEDIUM,
+        sa_column=sa.Column(
+            sa.Enum(
+                TaskPriority,
+                name="taskpriority",
+                values_callable=lambda obj: [e.value for e in obj],  # 👈 映射小写字符串 value
+            ),
+            nullable=False,
+            server_default="medium",
+        ),
+    )
+    due_date: datetime | None = Field(default=None)
 
 # 数据库表模型（真正对应数据库的表）
 class Task(TaskBase, table=True):
@@ -53,7 +72,8 @@ class TaskUpdate(TaskBase):
     title: str | None = Field(default=None, min_length=1, max_length=255)
     description: str | None = Field(default=None, max_length=1000)
     status: str | None = Field(default=None, min_length=1, max_length=255)
-
+    priority: TaskPriority | None = None
+    due_date: datetime | None = None
     
 # Properties to return via API, id is always required
 class TaskPublic(TaskBase):
