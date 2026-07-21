@@ -12,6 +12,7 @@ def get_datetime_utc() -> datetime:
 # 加上这几行，只给编辑器/类型检查器看
 if TYPE_CHECKING:
     from app.items.models import Item
+    from app.tasks.models import Task
 
 # 共享属性
 class UserBase(SQLModel):
@@ -59,6 +60,9 @@ class User(UserBase, table=True):
     # 修改这行：明确把目标模型的字符串 "Item" 传给 Relationship
     items: list["Item"] = Relationship(
         sa_relationship=relationship("Item", back_populates="owner", cascade="all, delete-orphan")
+    )
+    tasks: list["Task"] = Relationship(
+        sa_relationship=relationship("Task", back_populates="owner", cascade="all, delete-orphan")
     )
 
 # API 返回给前端的用户数据（过滤掉密码）

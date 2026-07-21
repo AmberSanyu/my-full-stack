@@ -20,6 +20,14 @@ from app.items.models import (
     ItemUpdate,
 )
 
+from app.tasks.models import (
+    Task,
+    TaskBase,
+    TaskCreate,
+    TaskUpdate,
+    TaskPublic
+)
+
 # 2. 保留原有的通用公共模型
 from sqlmodel import Field, SQLModel
 
